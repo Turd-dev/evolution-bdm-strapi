@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "blog_posts",
+  "info": {
+    "singularName": "blog-post",
+    "pluralName": "blog-posts",
+    "displayName": "Blog Post",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "dragAndDrop": {
+      "type": "dynamiczone",
+      "components": [
+        "blog.title-block",
+        "blog.list-blocks",
+        "blog.header-image",
+        "blog.blog-content",
+        "blog.author-block"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
