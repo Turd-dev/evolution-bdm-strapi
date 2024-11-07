@@ -2,64 +2,45 @@
 name: Backup Content
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger
   push:
     branches: [ main ]
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
 
 jobs:
   backup:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write      # Explicit permission to write to repo
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_PAT }}
-        fetch-depth: 0
+      uses: actions/checkout@v3    # No token needed here, uses default
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Set Git config
+    - name: Setup Git
       run: |
-        git config --global user.name 'Turd-dev'
-        git config --global user.email 'exceeltr@gmail.com'
-        git remote set-url origin "https://${{ secrets.GITHUB_PAT }}@github.com/Turd-dev/evolution-bdm-strapi.git"
+        git config --global user.name "Turd-dev"
+        git config --global user.email "github-actions@github.com"
 
-    - name: Create and push backup
+    - name: Create Backup
       run: |
-        # Create timestamp
         timestamp=$(date +'%Y%m%d_%H%M%S')
-
-        # Create backup directories
         mkdir -p backups/$timestamp/{content,config}
 
-        # Copy files from current directory
+        # Copy content files
         cp -r src/api backups/$timestamp/content/ 2>/dev/null || true
         cp -r src/components backups/$timestamp/content/ 2>/dev/null || true
         cp -r config backups/$timestamp/config/ 2>/dev/null || true
 
-        # Create info file
+        # Create backup info
         echo "Backup created at: $(date)" > backups/$timestamp/backup-info.txt
+        echo "Branch: ${{ github.ref }}" >> backups/$timestamp/backup-info.txt
 
-        # Git operations
-        git add backups/
-        git commit -m "Backup $timestamp" || echo "No changes to commit"
-        git push origin main || {
-          echo "Push failed, retrying with token..."
-          git push "https://${{ secrets.GITHUB_PAT }}@github.com/Turd-dev/evolution-bdm-strapi.git" main
-        }
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
-
-    - name: Verify backup
+    - name: Commit and Push
       run: |
-        ls -la backups/
-        echo "Latest backup contents:"
-        ls -R backups/$(ls -t backups/ | head -n1)
+        git add backups/
+        git commit -m "Backup $(date +'%Y%m%d_%H%M%S')" || echo "No changes to commit"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ github.token }}  # Uses default token
