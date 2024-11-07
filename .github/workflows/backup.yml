@@ -1,50 +1,59 @@
+# .github/workflows/backup.yml
 name: Strapi Backup
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Runs at minute 0 past every 6th hour
-  workflow_dispatch:        # Allows manual trigger from GitHub
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allows manual triggering
   push:
     branches:
-      - main              # Also runs on every push to main branch
+      - main
 
 jobs:
   backup:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
       with:
-        token: ${{ secrets.GITHUB_PAT }}  # Use your PAT for authentication
+        token: ${{ secrets.GITHUB_PAT }} # Use PAT instead of default token
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
+        cache: 'npm'
 
     - name: Install dependencies
       run: |
         cd strapi-project
-        npm install
+        npm ci
+
+    - name: Create backup directories
+      run: |
+        cd strapi-project
+        mkdir -p backups/$(date +%Y-%m-%d)
 
     - name: Export Strapi content
       run: |
         cd strapi-project
         npm run strapi export -- --no-encrypt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
 
-    - name: Create backup directory
+    - name: Move backup file
       run: |
         cd strapi-project
-        mkdir -p backups/$(date +%Y-%m-%d)
-        mv export_*.tar.gz backups/$(date +%Y-%m-%d)/
+        mv export_*.tar.gz backups/$(date +%Y-%m-%d)/backup_$(date +%Y%m%d_%H%M%S).tar.gz
 
     - name: Commit and push backup
       run: |
         cd strapi-project
-        git config --global user.email "github-actions@github.com"
-        git config --global user.name "GitHub Actions"
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
         git add backups/
-        git commit -m "Backup $(date +%Y-%m-%d_%H-%M-%S)"
-        git push origin main
+        git commit -m "Automated backup $(date +%Y-%m-%d_%H-%M-%S)"
+        git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
