@@ -1,0 +1,50 @@
+name: Strapi Backup
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs at minute 0 past every 6th hour
+  workflow_dispatch:        # Allows manual trigger from GitHub
+  push:
+    branches:
+      - main              # Also runs on every push to main branch
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GITHUB_PAT }}  # Use your PAT for authentication
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        cd strapi-project
+        npm install
+
+    - name: Export Strapi content
+      run: |
+        cd strapi-project
+        npm run strapi export -- --no-encrypt
+
+    - name: Create backup directory
+      run: |
+        cd strapi-project
+        mkdir -p backups/$(date +%Y-%m-%d)
+        mv export_*.tar.gz backups/$(date +%Y-%m-%d)/
+
+    - name: Commit and push backup
+      run: |
+        cd strapi-project
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add backups/
+        git commit -m "Backup $(date +%Y-%m-%d_%H-%M-%S)"
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
