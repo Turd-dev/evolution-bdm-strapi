@@ -1,51 +1,60 @@
-# .github/workflows/backup.yml
-name: Backup Content
+        # .github/workflows/backup.yml
+        name: Backup Content
 
-on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
-  push:
-    branches: [ main ]
+        on:
+          schedule:
+            - cron: '0 */6 * * *'
+          workflow_dispatch:
+          push:
+            branches: [ main ]
 
-jobs:
-  backup:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+        jobs:
+          backup:
+            runs-on: ubuntu-latest
+            environment: production
+            env:
+              GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+            steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '18'
 
-    - name: Set Git config
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git remote set-url origin https://${{ secrets.GITHUB_PAT }}@github.com/Turd-dev/evolution-bdm-strapi.git
+            - name: Set Git config
+              run: |
+                git config --global user.name 'github-actions[bot]'
+                git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+                git remote set-url origin https://$GITHUB_PAT@github.com/Turd-dev/evolution-bdm-strapi.git
 
-    - name: Create and push backup
-      run: |
-        cd strapi-project
-        timestamp=$(date +'%Y%m%d_%H%M%S')
-        mkdir -p backups/$timestamp/{content,config}
+            - name: Create and push backup
+              run: |
+                # Create timestamp
+                timestamp=$(date +'%Y%m%d_%H%M%S')
 
-        # Copy files
-        cp -r src/api backups/$timestamp/content/ 2>/dev/null || true
-        cp -r src/components backups/$timestamp/content/ 2>/dev/null || true
-        cp -r config backups/$timestamp/config/ 2>/dev/null || true
+                # Create backup directories
+                mkdir -p backups/$timestamp/{content,config}
 
-        # Create info file
-        echo "Backup created at: $(date)" > backups/$timestamp/backup-info.txt
+                # Copy files from current directory
+                cp -r src/api backups/$timestamp/content/ 2>/dev/null || true
+                cp -r src/components backups/$timestamp/content/ 2>/dev/null || true
+                cp -r config backups/$timestamp/config/ 2>/dev/null || true
 
-        # Git operations
-        git add backups/
-        git commit -m "Backup $timestamp" || echo "No changes to commit"
-        git push origin main
-      env:
-        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+                # Create info file
+                echo "Backup created at: $(date)" > backups/$timestamp/backup-info.txt
+
+                # Git operations
+                git add backups/
+                git commit -m "Backup $timestamp" || echo "No changes to commit"
+                git push origin main
+              env:
+                GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+
+            - name: Verify backup
+              run: |
+                ls -la backups/
+                echo "Latest backup contents:"
+                ls -R backups/$(ls -t backups/ | head -n1)
