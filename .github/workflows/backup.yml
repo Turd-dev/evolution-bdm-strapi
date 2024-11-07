@@ -11,9 +11,8 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    environment: production
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
@@ -28,7 +27,7 @@ jobs:
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git remote set-url origin https://$GITHUB_PAT@github.com/Turd-dev/evolution-bdm-strapi.git
+        git remote set-url origin https://${{ secrets.GITHUB_PAT }}@github.com/Turd-dev/evolution-bdm-strapi.git
 
     - name: Create and push backup
       run: |
@@ -49,4 +48,4 @@ jobs:
         git commit -m "Backup $timestamp" || echo "No changes to commit"
         git push origin main
       env:
-        GITHUB_PAT: ${{ process.env.GITHUB_PAT }}
+        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
