@@ -2,45 +2,47 @@
 name: Backup Content
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
   schedule:
     - cron: '0 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   backup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
+        fetch-depth: 0
         token: ${{ secrets.GITHUB_PAT }}
 
-    - name: Setup Git
-      run: |
-        git config --global user.name "GitHub Action Bot"
-        git config --global user.email "actions@github.com"
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
 
-    - name: Create backup
+    - name: Set Git config
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Install dependencies
       run: |
         cd strapi-project
-        timestamp=$(date +'%Y%m%d_%H%M%S')
-        mkdir -p backups/$timestamp/{content,config}
+        npm ci
 
-        # Copy content files
-        cp -r src/api backups/$timestamp/content/ 2>/dev/null || true
-        cp -r src/components backups/$timestamp/content/ 2>/dev/null || true
-        cp -r config backups/$timestamp/config/ 2>/dev/null || true
-
-        # Create info file
-        echo "Backup created at: $(date)" > backups/$timestamp/backup-info.txt
-
-        # Commit and push
-        git add backups/
-        git commit -m "Backup $timestamp" || true
-        git push
-
+    - name: Create and push backup
+      run: |
+        cd strapi-project
+        node scripts/backup.js
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+
+permissions:
+  contents: write
