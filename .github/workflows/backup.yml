@@ -11,38 +11,42 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment: production
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_PAT }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
 
     - name: Set Git config
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-    - name: Install dependencies
-      run: |
-        cd strapi-project
-        npm ci
+        git remote set-url origin https://$GITHUB_PAT@github.com/Turd-dev/evolution-bdm-strapi.git
 
     - name: Create and push backup
       run: |
         cd strapi-project
-        node scripts/backup.js
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+        timestamp=$(date +'%Y%m%d_%H%M%S')
+        mkdir -p backups/$timestamp/{content,config}
 
-permissions:
-  contents: write
+        # Copy files
+        cp -r src/api backups/$timestamp/content/ 2>/dev/null || true
+        cp -r src/components backups/$timestamp/content/ 2>/dev/null || true
+        cp -r config backups/$timestamp/config/ 2>/dev/null || true
+
+        # Create info file
+        echo "Backup created at: $(date)" > backups/$timestamp/backup-info.txt
+
+        # Git operations
+        git add backups/
+        git commit -m "Backup $timestamp" || echo "No changes to commit"
+        git push origin main
+      env:
+        GITHUB_PAT: ${{ process.env.GITHUB_PAT }}
