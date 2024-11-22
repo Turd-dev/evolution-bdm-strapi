@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_blog_heading2s",
+  "info": {
+    "displayName": "heading2"
+  },
+  "options": {},
+  "attributes": {
+    "heading2text": {
+      "type": "string"
+    }
+  }
+}
