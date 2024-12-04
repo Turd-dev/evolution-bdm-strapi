@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blog_title_blocks",
+  "info": {
+    "displayName": "Title Block",
+    "icon": "arrowDown",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "string"
+    }
+  }
+}
