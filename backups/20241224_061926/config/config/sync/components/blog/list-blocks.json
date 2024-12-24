@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blog_list_blocks",
+  "info": {
+    "displayName": "List Blocks",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "listTitle": {
+      "type": "string",
+      "required": false
+    },
+    "listItems": {
+      "type": "blocks",
+      "required": true
+    }
+  }
+}
