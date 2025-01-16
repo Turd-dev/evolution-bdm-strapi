@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_blog_author_blocks",
+  "info": {
+    "displayName": "Author Block"
+  },
+  "options": {},
+  "attributes": {
+    "authorName": {
+      "type": "string",
+      "required": true
+    },
+    "Date": {
+      "type": "datetime"
+    },
+    "Avatar": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
+    }
+  }
+}
