@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_blog_header_images",
+  "info": {
+    "displayName": "Header Image",
+    "icon": "landscape",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "altText": {
+      "type": "string"
+    },
+    "blogImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}
