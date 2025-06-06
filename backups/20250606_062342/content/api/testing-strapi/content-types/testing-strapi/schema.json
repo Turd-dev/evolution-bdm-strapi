@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "testing_strapis",
+  "info": {
+    "singularName": "testing-strapi",
+    "pluralName": "testing-strapis",
+    "displayName": "Testing Strapi"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "True": {
+      "type": "boolean"
+    }
+  }
+}
