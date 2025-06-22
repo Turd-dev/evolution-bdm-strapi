@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blog_texts",
+  "info": {
+    "displayName": "text",
+    "icon": "cast",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "textContent": {
+      "type": "blocks"
+    }
+  }
+}
