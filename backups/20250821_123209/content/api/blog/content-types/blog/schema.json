@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "blogs",
+  "info": {
+    "singularName": "blog",
+    "pluralName": "blogs",
+    "displayName": "Blogs",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "blogStructures": {
+      "type": "dynamiczone",
+      "components": [
+        "blog.split-content",
+        "blog.list-items",
+        "blog.list-blocks",
+        "blog.heading3",
+        "blog.heading2",
+        "blog.heading1",
+        "blog.header-image",
+        "blog.text"
+      ]
+    }
+  }
+}
