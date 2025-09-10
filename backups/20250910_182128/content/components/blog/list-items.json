@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_blog_list_items",
+  "info": {
+    "displayName": "listItems",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "listText": {
+      "type": "string"
+    }
+  }
+}
