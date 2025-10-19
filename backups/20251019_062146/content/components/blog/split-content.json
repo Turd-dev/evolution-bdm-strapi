@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_blog_split_contents",
+  "info": {
+    "displayName": "split-content"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "imageAlt": {
+      "type": "string"
+    }
+  }
+}
